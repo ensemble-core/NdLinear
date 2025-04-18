@@ -88,15 +88,17 @@ This example demonstrates how to use the `NdLinear` layers in a forward pass set
 
 ```python 
 import torch
+import torch.nn.functional as F 
 from ndlinear import NdLinear
 
-input_tensor = torch.randn(32, 128)
+#Create input tensor with shape [batch_size=32, feature_dim=128]
+input_tensor = torch.randn(32, 128) 
 
-# Define the first NdLinear layer for the MLP with input dimensions (128, 8) and hidden size (64, 8)
-layer1 = NdLinear(input_dims=(128, 8), hidden_size=(64, 8))
+# Define the first NdLinear layer for the MLP with input dimensions 128 and hidden size 64
+layer1 = NdLinear(input_dims=(128,), hidden_size=(64,))
 
-# Define the second NdLinear layer for the MLP with input dimensions (64, 8) and hidden size (10, 2)
-layer2 = NdLinear(input_dims=(64, 8), hidden_size=(10, 2))
+# Define the second NdLinear layer for the MLP with input dimensions 64 and hidden size 10
+layer2 = NdLinear(input_dims=(64,), hidden_size=(10,))
 
 x = F.relu(layer1(input_tensor))
 
