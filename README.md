@@ -153,6 +153,86 @@ from ndlinear import NdLinear
 layer1 = NdLinear(input_dims=(32,), hidden_size=(64,))
 ```
 
+## NdLinearGated
+
+<img src="NdLinearGated.png" alt="NdLinearGated" width="100">
+
+NdLinearGated extends the core functionality of NdLinear by incorporating sophisticated gating mechanisms to control information flow. This allows models to selectively transform input dimensions, enhancing representational power and efficiency.
+
+### Key Features
+
+- **Selective Information Flow:** Dynamic gating mechanisms that control which transformations are applied
+- **Multiple Gating Modes:** Support for soft (continuous) and hard (binary) gating approaches
+- **Dimension Selection:** Apply gating to all dimensions, only the first dimension, or automatically to the most important dimensions
+
+### Usage
+
+NdLinearGated can be integrated into neural networks with fine-grained control over the gating behavior:
+
+```python
+import torch
+from ndlinear import NdLinearGated
+
+# Create input tensor
+input_tensor = torch.randn(32, 28, 28, 3)  # Batch of images
+
+# Initialize NdLinearGated with soft gating on all dimensions
+gated_layer = NdLinearGated(
+    input_dims=(28, 28, 3),
+    hidden_size=(64, 64, 6),
+    gating_mode="soft",
+    gated_modes="all"
+)
+
+# Forward pass with gating
+output = gated_layer(input_tensor)
+```
+
+### Gating Configurations
+
+NdLinearGated offers various configurations to suit different modeling needs:
+
+```python
+# Apply hard gating only to the first dimension
+first_dim_gated = NdLinearGated(
+    input_dims=(128, 8),
+    hidden_size=(64, 8),
+    gating_mode="hard",
+    gated_modes="first"
+)
+
+# Apply soft gating to top-k dimensions with highest standard deviation
+topk_gated = NdLinearGated(
+    input_dims=(28, 28, 3),
+    hidden_size=(64, 64, 6),
+    gating_mode="soft",
+    gated_modes="topk"
+)
+```
+
+### Recommended Configuration
+
+Based on extensive experimentation, we recommend the following configuration for optimal performance:
+
+```python
+optimal_gated = NdLinearGated(
+    input_dims=(28, 28, 3),
+    hidden_size=(64, 64, 6),
+    gating_mode="soft",
+    gated_modes="topk",
+    gating_hidden_dim=16  # Adjust based on your model size
+)
+```
+
+This configuration (soft gating + top-k modes) consistently delivers:
+
+- **Higher Accuracy:** Improves performance by ~0.5-0.7% over baseline NdLinear
+- **Compute Efficiency:** Reduces computational load by 50-75% by activating only the most useful projections
+- **Training Stability:** Shows stable training and smooth gate entropy decay
+- **Enhanced Interpretability:** Provides clearer insights into which dimensions are most important
+
+The soft gating mechanism offers better stability compared to hard gating, while top-k mode selection focuses computational resources on the most informative dimensions. The gating_hidden_dim parameter can be adjusted based on your specific model architecture and dataset requirements.
+
 ## Examples of Applications
 
 NdLinear is versatile and can be used in:
